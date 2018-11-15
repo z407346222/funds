@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style>
+			.mui-radio{
+				float: left;
+			}
+			.mui-input-row label~input{
+				padding-left: 15px;
+				border: 1px solid rgba(0,0,0,.2);
+			}
+			.mui-input-row label+input{
+				background: #fff;
+			}
+			.mui-input-row{
+				margin: 10px 40px 0px 10px;
+			}
+			body,.mui-content{
+				background: #FFFFFF;
+			}
+			.mui-bar{
+				background: url(img/bar.png);
+			}
+			.mui-title,.mui-bar-nav.mui-bar .mui-icon{
+				color: #FFFFFF;
+			}
+			.mui-checkbox input[type=checkbox]:checked:before, .mui-radio input[type=radio]:checked:before{
+				color: #FF462B;
+			}
+			input[type=text]{
+				border-radius: 10px;
+			}
+			.mui-btn-danger{
+				border: 1px solid #980200;
+				background-color: #980200;
+				border-radius: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">账号激活</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div class="mui-input-row" style="margin-top: 20px;">
+					<label class="mui-text-right">姓名</label>
+					<input type="text" class="mui-input-clear" placeholder="请输入真实姓名" id="username">
+				</div>
+				<div class="mui-input-row">
+					<label class="mui-text-right">性别</label>
+					<div class="mui-row">
+						<div class="mui-radio mui-left">
+							<label>男</label>
+							<input name="sex" value="1" type="radio" style="padding-left: 0px;" checked>
+						</div>
+						<div class="mui-radio mui-left">
+							<label>女</label>
+							<input name="sex" value="2" type="radio" style="padding-left: 0px;">
+						</div>
+					</div>
+				</div>
+				<div class="mui-input-row">
+					<label class="mui-text-right">身份证</label>
+					<input type="text" class="mui-input-clear" placeholder="请输入身份证号" id="card">
+				</div>
+				<div class="mui-input-row" style="margin-top: 20px;">
+					<label class="mui-text-right">手机</label>
+					<input type="text" class="mui-input-clear" placeholder="请输入手机号码" id="phone">
+				</div>
+			</div>
+			<div class="mui-content-padded" style="margin: 40px;">
+				<button id='active' class="mui-btn mui-btn-block mui-btn-danger">确认激活</button>
+			</div>
+		</div>
+		<script src="js/mui.js"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var activeButton = doc.getElementById('active');
+					var username = document.getElementById('username');//姓名
+					var sex = document.getElementsByName("sex");//性别
+					var sexValue = 0;
+					for (i=0; i<sex.length; i++) {
+						if (sex[i].checked) {
+							sexValue = sex[i].value;
+						}
+					}
+					var card = document.getElementById('card');//身份证
+					var phone = document.getElementById('phone');//手机
+					
+					activeButton.addEventListener('tap',function(event){
+						var uid = localStorage.getItem('uid');
+						if(username.value ==''){
+							plus.nativeUI.toast('请输入真实姓名');
+							return false;
+						}else{
+							var regName =/^[\u4e00-\u9fa5]{2,4}$/; 
+							if(!regName.test(username.value)){
+							   plus.nativeUI.toast('真实姓名填写有误');
+							   return false; 
+							}
+						}
+						if(card.value ==''){
+							plus.nativeUI.toast('请输入身份证号');
+							return false;
+						}else{
+							var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; 
+						    if(reg.test(card.value) === false){
+								plus.nativeUI.toast('身份证输入不合法');
+								return false; 
+						    } 
+						}
+						if(phone.value ==''){
+							plus.nativeUI.toast('请输入手机号码');
+							return false;
+						}else{
+							if(!(/^1(3|4|5|7|8)\d{9}$/.test(phone.value))){ 
+								plus.nativeUI.toast('请正确输入手机号码');
+								return false; 
+							}
+						}
+						mui.ajax(localStorage.getItem('url')+'/phone/activeByPhone.do',{
+							data:{
+								uid:uid,
+								user_name: username.value,
+								sex: sexValue,
+								card:card.value,
+								phone:phone.value
+							},
+							dataType:'json',//服务器返回json格式数据
+							type:'post',//HTTP请求类型
+							timeout:10000,//超时时间设置为10秒；
+							// headers:{'Content-Type':'application/json'},
+							success:function(data){
+								var state = data.state;
+								var msg = data.msg;
+								//验证成功登录
+								if(state==100){
+									plus.nativeUI.toast('激活成功');
+									$.openWindow({
+										url: 'index.html',
+										id: 'index',
+										preload: true,
+										show: {
+											aniShow: 'pop-in'
+										},
+										styles: {
+											popGesture: 'hide'
+										},
+										waiting: {
+											autoShow: true
+										}
+									});
+								}else{//其他问题提示
+									plus.nativeUI.toast(msg);
+								}
+							},
+							error:function(xhr,type,errorThrown){
+								plus.nativeUI.toast('网络异常请稍后尝试');
+							}
+						});
+					});
+				});
+			}(mui, document));
+		</script>
+	</body>
+</html>

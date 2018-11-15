@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style>
+				.mui-content{
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background: url(img/bg.png)no-repeat;
+				background-size: 100%100%;
+				position: fixed;
+			}
+			.mui-btn-danger{
+				border: 1px solid #980200;
+				background-color: #980200;
+				border-radius: 10px;
+			}
+			.user{
+				background-image: url(img/user.png);/*设置小图标*/
+				background-size: 25px 25px;/*小图标的大小*/
+				background-position: 8px 10px;/*小图标在input的位置*/
+				background-repeat: no-repeat;/*背景小图标不重复*/
+				padding: 8px 10px 8px 40px;/*设置input内边距*/
+			}
+			.pwd{
+				background-image: url(img/password.png);/*设置小图标*/
+				background-size: 25px 25px;/*小图标的大小*/
+				background-position: 8px 10px;/*小图标在input的位置*/
+				background-repeat: no-repeat;/*背景小图标不重复*/
+				padding: 8px 10px 8px 40px;/*设置input内边距*/
+			}
+			input[type=text],input[type=password]{
+				 height: 50px;
+				 padding: 10px 15px 10px 45px;
+				 border-radius: 10px;
+			}
+			.mui-content-padded {
+				margin: 40px;
+			}
+			.mui-btn {
+				padding: 10px;
+			}
+			.mui-input-row .mui-input-clear~.mui-icon-clear{
+				top: 15px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div class="mui-content-padded" style="text-align: center;margin-top: 80px;">
+				<img src="img/logo.png" style="width: 100px;"/>
+			</div>
+			<div class="mui-content-padded">
+				<div class="mui-input-row">
+					<input type="text" class="mui-input-clear user" placeholder="请输入账号" id="user">
+				</div>
+				<div class="mui-input-row">
+					<input type="password" class="mui-input-clear pwd" placeholder="请输入密码" id="password">
+				</div>
+			</div>
+			<div class="mui-content-padded">
+				<button id='login' class="mui-btn mui-btn-block mui-btn-danger">登&nbsp;&nbsp;录</button>
+			</div>
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="js/mui.enterfocus.js"></script>
+		<script src="js/app.js"></script>
+		<script src="js/addr.js"></script>
+		<script>
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var loginButton = doc.getElementById('login');
+					var user = document.getElementById('user');
+					var password = document.getElementById('password');
+					loginButton.addEventListener('tap',function(event){
+						if(user.value ==''){
+							plus.nativeUI.toast('请输入账号');
+							return false;
+						}
+						if(password.value ==''){
+							plus.nativeUI.toast('请输入密码');
+							return false;
+						}
+						mui.ajax(localStorage.getItem('url')+'/phone/loginByPhone.do',{
+							data:{
+								user_name: user.value,
+								password: password.value
+							},
+							dataType:'json',//服务器返回json格式数据
+							type:'post',//HTTP请求类型
+							timeout:10000,//超时时间设置为10秒；
+							// headers:{'Content-Type':'application/json'},
+							success:function(data){
+								var state = data.state;
+								var uid = data.uid;
+								var msg = data.msg;
+								//验证成功登录
+								if(state==100){
+									plus.nativeUI.toast('登录成功');
+									localStorage.setItem('uid',uid);
+									localStorage.setItem('username',user.value);
+									$.openWindow({
+										url: 'index.html',
+										id: 'index',
+										preload: true,
+										show: {
+											aniShow: 'pop-in'
+										},
+										styles: {
+											popGesture: 'hide'
+										},
+										waiting: {
+											autoShow: false
+										}
+									});
+								}else if(state==101){//第一登录跳转激活
+									plus.nativeUI.toast('账号未激活，请先激活');
+									localStorage.setItem('uid',uid);
+									$.openWindow({
+										url: 'active.html',
+										id: 'active',
+										preload: true,
+										show: {
+											aniShow: 'pop-in'
+										},
+										styles: {
+											popGesture: 'hide'
+										},
+										waiting: {
+											autoShow: false
+										}
+									});
+								}else{//其他问题提示
+									plus.nativeUI.toast(msg);
+								}
+							},
+							error:function(xhr,type,errorThrown){
+								plus.nativeUI.toast('网络异常请稍后尝试');
+							}
+						});
+					});
+					//登录界面退出
+					var backButtonPress = 0;
+					$.back = function(event) {
+						backButtonPress++;
+						if (backButtonPress > 1) {
+							plus.runtime.quit();
+							localStorage.clear();
+						} else {
+							plus.nativeUI.toast('再按一次退出应用');
+						}
+						setTimeout(function() {
+							backButtonPress = 0;
+						}, 1000);
+						return false;
+					};
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>

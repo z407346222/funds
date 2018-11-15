@@ -1,0 +1,462 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style>
+			body,.mui-content{
+				background: #FFFFFF;
+			}
+			.mui-bar{
+				background: url(img/bar.png);
+			}
+			.mui-title,.mui-bar-nav.mui-bar .mui-icon{
+				color: #FFFFFF;
+			}
+			.mui-off-canvas-left{
+				background: url(img/bar.png) no-repeat;
+				background-size: cover;
+			}
+			.mui-bar~.mui-content .mui-fullscreen {
+				top: 44px;
+				height: auto;
+			}
+			.mui-segmented-control.mui-scroll-wrapper{
+				height: 40px;
+			}
+			.mui-pull-top-tips {
+				position: absolute;
+				top: -20px;
+				left: 50%;
+				margin-left: -25px;
+				width: 40px;
+				height: 40px;
+				border-radius: 100%;
+				z-index: 1;
+			}
+			.mui-bar~.mui-pull-top-tips {
+				top: 24px;
+			}
+			.mui-pull-top-wrapper {
+				width: 42px;
+				height: 42px;
+				display: block;
+				text-align: center;
+				background-color: #efeff4;
+				border: 1px solid #ddd;
+				border-radius: 25px;
+				background-clip: padding-box;
+				box-shadow: 0 4px 10px #bbb;
+				overflow: hidden;
+			}
+			.mui-pull-top-tips.mui-transitioning {
+				-webkit-transition-duration: 200ms;
+				transition-duration: 200ms;
+			}
+			.mui-pull-top-tips .mui-pull-loading {
+				/*-webkit-backface-visibility: hidden;
+				-webkit-transition-duration: 400ms;
+				transition-duration: 400ms;*/
+				
+				margin: 0;
+			}
+			.mui-pull-top-wrapper .mui-icon,
+			.mui-pull-top-wrapper .mui-spinner {
+				margin-top: 7px;
+			}
+			.mui-pull-top-wrapper .mui-icon.mui-reverse {
+				/*-webkit-transform: rotate(180deg) translateZ(0);*/
+			}
+			.mui-pull-bottom-tips {
+				text-align: center;
+				background-color: #efeff4;
+				font-size: 15px;
+				line-height: 40px;
+				color: #777;
+			}
+			.mui-pull-top-canvas {
+				overflow: hidden;
+				background-color: #fafafa;
+				border-radius: 40px;
+				box-shadow: 0 4px 10px #bbb;
+				width: 40px;
+				height: 40px;
+				margin: 0 auto;
+			}
+			.mui-pull-top-canvas canvas {
+				width: 40px;
+			}
+			.mui-slider-indicator.mui-segmented-control {
+				background-color: #efeff4;
+			}
+			.mui-icon-upload{
+				padding-top: 10px;
+			}
+			.mui-scroll{
+				background: #FFFFFF;
+				}
+			#sliderSegmentedControl{
+				margin-top: 15px;
+			}
+			.mui-scroll .mui-control-item{
+			    width: 25% !important;
+					border: 1px solid !important;
+					border-radius: 5px;
+			}
+			.mui-segmented-control.mui-scroll-wrapper .mui-scroll{
+				width: 100%;
+			}
+			.mui-fullscreen .mui-segmented-control~.mui-slider-group{
+				top: 70px;
+			}
+			.mui-segmented-control.mui-segmented-control-inverted .mui-control-item{
+				color: #ff5626;
+			}
+			.mui-segmented-control.mui-segmented-control-inverted .mui-control-item.mui-active{
+				color: #fff;
+				background: #ff5626;
+			}
+			.sidenav {
+				/* background: rgb(50, 60, 60); */
+				width: 100%;
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				padding-top: 150px;
+			}
+			.sidenav li {
+				list-style-type: none;
+				line-height: 50px;
+			}
+			.sidenav a {
+				color: white;
+				text-decoration: none;
+			}
+			.sidenav i {
+				display: block;
+				width: 50px;
+				float: left;
+				font-size: 16px;
+				line-height: 48px;
+				text-align: center;
+				font-weight: 800;
+			}
+			.vcc_head{
+				width: 100%;
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				padding-top: 70px;
+				text-align: center;
+				color: white;
+			}
+			.vcc_head .vcc_tx img{
+				border-radius: 100%;
+			}
+			.vcc_zh{
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- 主界面菜单同时移动 -->
+			<!-- 侧滑导航根容器 -->
+			<div class="mui-off-canvas-wrap mui-draggable">
+				<!-- 主页面容器 -->
+				<div class="mui-inner-wrap">
+					<!-- 菜单容器 -->
+					<aside class="mui-off-canvas-left" id="offCanvasSide">
+						<div class="mui-scroll-wrapper">
+							<div class="mui-scroll">
+								<!-- 菜单具体展示内容 -->
+								<div class="vcc_head">
+									<div class="vcc_tx"><img src="img/tx.png"></div>
+									<div class="vcc_zh">当前账号：<span id="vcc_name"></span></div>
+								</div>
+								<ul class="sidenav">
+									<li><a href="#" id="reset_pwd"><i class="mui-icon mui-icon-locked"></i><b>修改密码</b></a></li>
+									<li><a href="#" id="logout"><i class="mui-icon mui-icon-chatboxes"></i><b>注销账号</b></a></li>
+								</ul>
+							</div>
+						</div>
+					</aside>
+					<!-- 主页面标题 -->
+					<header class="mui-bar mui-bar-nav">
+						<a class="mui-icon mui-action-menu mui-icon-bars mui-pull-left" href="#offCanvasSide"></a>
+						<h1 class="mui-title">项目反馈列表</h1>
+					</header>
+					<!-- 主页面内容容器 -->
+					<div class="mui-content">
+						<div id="slider" class="mui-slider mui-fullscreen">
+							<div id="sliderSegmentedControl" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+								<div class="mui-scroll">
+									<a class="mui-control-item mui-active" href="#item1mobile">
+										未上传
+									</a>
+									<a class="mui-control-item" href="#item2mobile">
+										未完成
+									</a>
+									<a class="mui-control-item" href="#item3mobile">
+										已完成
+									</a>
+								</div>
+							</div>
+							<div class="mui-slider-group">
+								<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+									<div id="scroll1" class="mui-scroll-wrapper">
+										<div class="mui-scroll">
+											<ul class="mui-table-view" id="item0">
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div id="item2mobile" class="mui-slider-item mui-control-content">
+									<div class="mui-scroll-wrapper">
+										<div class="mui-scroll">
+											<ul class="mui-table-view" id="item1">
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div id="item3mobile" class="mui-slider-item mui-control-content">
+									<div class="mui-scroll-wrapper">
+										<div class="mui-scroll">
+											<ul class="mui-table-view" id="item2">
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+			   	 <div class="mui-off-canvas-backdrop"></div>
+				</div>
+			</div>
+		<div class="mui-content">
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="js/mui.pullToRefresh.js"></script>
+		<script src="js/mui.pullToRefresh.material.js"></script>
+		<script src="js/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				  $.init();
+					//获取用户uid
+					var uid = localStorage.getItem('uid');
+					var username = localStorage.getItem('username');
+					var user = document.getElementById('vcc_name');
+					user.innerHTML=username;
+					//阻尼系数
+					var deceleration = mui.os.ios?0.003:0.0009;
+					$('.mui-scroll-wrapper').scroll({
+						bounce: false, 
+						indicators: true, //是否显示滚动条
+						deceleration:deceleration
+					});
+					$.ready(function() {
+						//循环初始化所有下拉刷新，上拉加载。
+						$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+							$(pullRefreshEl).pullToRefresh({
+								up: {
+									callback: function() {
+										var self = this;
+										setTimeout(function() {
+											var ul = self.element.querySelector('.mui-table-view');
+											var size = getList(ul,5,index);
+											self.endPullUpToRefresh(size-5<0);
+										}, 1000);
+									}
+								}
+							});
+						});
+						//获取下拉列表信息
+						var createFragment = function(ul, index, count, reverse) {
+							getList(ul,count,index);
+						};
+						var up_lis=[];
+						function toUpload(){
+							var obj_lis = document.getElementsByClassName('toUpload');
+							if(up_lis.length==0){
+								for(i=0;i<obj_lis.length;i++){
+									up_lis.push(obj_lis[i].id)
+									obj_lis[i].addEventListener('tap',function(event){
+										var self = this;
+										var ids = self.id;
+										var id = ids.split('_');
+										$.openWindow({
+											url: 'content.html',
+											id: 'content'+id[1],
+											preload: true,
+											show: {
+												aniShow: 'pop-in'
+											},
+											styles: {
+												popGesture: 'hide'
+											},
+											waiting: {
+												autoShow: true
+											},
+											extras:{
+												contentId:id[1]
+											}
+										});
+									})
+								}
+							}else{
+								for(i=0;i<obj_lis.length;i++){
+									if(jQuery.inArray(obj_lis[i].id, up_lis)==-1){
+										up_lis.push(obj_lis[i].id)
+										obj_lis[i].addEventListener('tap',function(event){
+											var self = this;
+											var ids = self.id;
+											var id = ids.split('_');
+											$.openWindow({
+												url: 'content.html',
+												id: 'content'+id[1],
+												preload: true,
+												show: {
+													aniShow: 'pop-in'
+												},
+												styles: {
+													popGesture: 'hide'
+												},
+												waiting: {
+													autoShow: true
+												},
+												extras:{
+													contentId:id[1]
+												}
+											});
+										})
+									}
+								}
+							}
+						}
+						var getList = function (ul,count,type){
+							var length = ul.querySelectorAll('li').length;
+							var fragment = document.createDocumentFragment();
+							var li;
+							var size =0;
+							mui.ajax(localStorage.getItem('url')+'/phone/taskList.do',{
+								data:{
+									uid:uid,
+									lengths: length,
+									count: count,
+									type:type+1
+								},
+								dataType:'json',//服务器返回json格式数据
+								type:'post',//HTTP请求类型
+								async:false,
+								timeout:10000,//超时时间设置为10秒；
+								// headers:{'Content-Type':'application/json'},
+								success:function(data){
+									var state = data.state;
+									var msg = data.msg;
+									//验证成功登录
+									if(state==100){
+										var html='';
+											size =data.list.length;
+											for(var i=0;i<data.list.length;i++){
+												var li = document.createElement('li');
+												li.className = 'mui-table-view-cell mui-media';
+												html = '<a href="javascript:;"><span class="mui-icon mui-pull-right mui-icon-upload toUpload" id="list_'+data.list[i].designate_task_id+'"></span><div class="mui-media-body">'+data.list[i].assign_years+'年 '+data.list[i].assign_theme+' <p class="mui-ellipsis">拨款金额：'+fmoney(data.list[i].assign_money, 2)+'</p><p class="mui-ellipsis">截止时间：'+getMoth(data.list[i].end_time)+'</p></div></a>';
+												li.innerHTML = html;
+												fragment.appendChild(li)
+											}
+										ul.appendChild(fragment);
+										toUpload();
+									}else{//其他问题提示
+										plus.nativeUI.toast(msg);
+									}
+								},
+								error:function(xhr,type,errorThrown){
+									plus.nativeUI.toast('网络异常请稍后尝试');
+								},
+							});
+							return size;
+						}
+						//首次页面加载类别
+						onToLaod();
+						function onToLaod(){
+							var ul = document.querySelector('.mui-table-view');
+							getList(ul,5,0);
+							localStorage.setItem('tab',0);
+						}
+						//资金格式化
+						function fmoney(s, n){   
+						   n = n > 0 && n <= 20 ? n : 2;   
+						   s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";   
+						   var l = s.split(".")[0].split("").reverse(),   
+						   r = s.split(".")[1];   
+						   t = "";   
+						   for(i = 0; i < l.length; i ++ )   
+						   {   
+							  t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");   
+						   }   
+						   return t.split("").reverse().join("") + "." + r;   
+						}
+						//毫秒值格式化时间
+						function getMoth(str){  
+							var oDate = new Date(str), 
+							oYear = oDate.getFullYear(), 
+							oMonth = oDate.getMonth()+1,  
+							oDay = oDate.getDate(),  
+							oTime = oYear +'-'+ getzf(oMonth) +'-'+ getzf(oDay);//最后拼接时间  
+							return oTime;  
+						};
+						//时间补0
+						function getzf(num){  
+							if(parseInt(num) < 10){  
+								num = '0'+num;  
+							}  
+							return num;  
+						} 
+						document.getElementById('slider').addEventListener('slide', function(e) {
+							var self = this;
+							var ul = self.querySelector('#item'+e.detail.slideNumber);
+							var length = ul.querySelectorAll('li').length;
+							getList(ul,5,e.detail.slideNumber);
+							tab=e.detail.slideNumber;
+							localStorage.setItem('tab',tab);
+						})
+						document.getElementById('reset_pwd').addEventListener('tap', function(e) {
+							$.openWindow({
+								url: 'resetPwd.html',
+								id: 'resetPwd',
+								preload: true,
+								show: {
+									aniShow: 'pop-in'
+								},
+								styles: {
+									popGesture: 'hide'
+								},
+								waiting: {
+									autoShow: true
+								}
+							});
+						})
+						document.getElementById('logout').addEventListener('tap', function(e) {
+							var btnArray = ['否', '是'];
+							mui.confirm('确定要注销当前账号？', '提示', btnArray, function(e) {
+								if (e.index == 1) {
+									localStorage.clear();
+									plus.runtime.restart();
+								}
+							})
+						})
+						window.addEventListener('toRefresh', function(e){//执行刷新
+							location.reload();
+							console.log(1111)
+						});
+					});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>

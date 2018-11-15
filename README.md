@@ -1,2 +1,0 @@
-# funds
-funds app

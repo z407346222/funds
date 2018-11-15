@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style>
+			.mui-radio{
+				float: left;
+			}
+			.mui-input-row label~input{
+				padding-left: 15px;
+				border: 1px solid rgba(0,0,0,.2);
+			}
+			.mui-input-row label+input{
+				background: #fff;
+			}
+			.mui-input-row{
+				margin: 10px 40px 0px 10px;
+			}
+			body,.mui-content{
+				background: #FFFFFF;
+			}
+			.mui-bar{
+				background: url(img/bar.png);
+			}
+			.mui-title,.mui-bar-nav.mui-bar .mui-icon{
+				color: #FFFFFF;
+			}
+			.mui-checkbox input[type=checkbox]:checked:before, .mui-radio input[type=radio]:checked:before{
+				color: #FF462B;
+			}
+			input[type=text]{
+				border-radius: 10px;
+			}
+			.mui-btn-danger{
+				border: 1px solid #980200;
+				background-color: #980200;
+				border-radius: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">账号激活</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div class="mui-input-row" style="margin-top: 20px;">
+					<label class="mui-text-right">原密码</label>
+					<input type="password" class="mui-input-clear" placeholder="请输入原密码" id="old_pwd">
+				</div>
+				<div class="mui-input-row">
+					<label class="mui-text-right">新密码</label>
+					<input type="password" class="mui-input-clear" placeholder="请输入新密码" id="new_pwd">
+				</div>
+				<div class="mui-input-row">
+					<label class="mui-text-right">确认密码</label>
+					<input type="password" class="mui-input-clear" placeholder="请输入确认密码" id="sure_pwd">
+				</div>
+			</div>
+			<div class="mui-content-padded" style="margin: 40px;">
+				<button id='active' class="mui-btn mui-btn-block mui-btn-danger">确认修改</button>
+			</div>
+		</div>
+		<script src="js/mui.js"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var activeButton = doc.getElementById('active');
+					var old_pwd = document.getElementById('old_pwd');//原密码
+					var new_pwd = document.getElementById('new_pwd');//新密码
+					var sure_pwd = document.getElementById('sure_pwd');//确认密码
+					
+					activeButton.addEventListener('tap',function(event){
+						var uid = localStorage.getItem('uid');
+						if(old_pwd.value ==''){
+							plus.nativeUI.toast('请输入原密码');
+							return false;
+						}
+						if(new_pwd.value ==''){
+							plus.nativeUI.toast('请输入新密码');
+							return false;
+						}else{
+							if(new_pwd.value.length<6){
+							   plus.nativeUI.toast('新密码不能少于6位');
+							   return false; 
+							}
+						}
+						if(sure_pwd.value ==''){
+							plus.nativeUI.toast('请输入确认密码');
+							return false;
+						}else{
+							if(new_pwd.value!=sure_pwd.value){ 
+								plus.nativeUI.toast('两次输入密码不一致');
+								return false; 
+							}
+						}
+						mui.ajax(localStorage.getItem('url')+'/phone/updatePwdByPhone.do',{
+							data:{
+								uid:uid,
+								old_pwd: old_pwd.value,
+								password:new_pwd.value
+							},
+							dataType:'json',//服务器返回json格式数据
+							type:'post',//HTTP请求类型
+							timeout:10000,//超时时间设置为10秒；
+							// headers:{'Content-Type':'application/json'},
+							success:function(data){
+								var state = data.state;
+								var msg = data.msg;
+								//验证成功登录
+								if(state==100){
+									plus.nativeUI.toast('修改成功');
+								}else{//其他问题提示
+									plus.nativeUI.toast(msg);
+								}
+							},
+							error:function(xhr,type,errorThrown){
+								plus.nativeUI.toast('网络异常请稍后尝试');
+							}
+						});
+					});
+				});
+			}(mui, document));
+		</script>
+	</body>
+</html>

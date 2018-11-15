@@ -1,0 +1,365 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="HandheldFriendly" content="true"/>
+<meta name="MobileOptimized" content="320"/>
+<title></title>
+<link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8"/>
+<link rel="stylesheet" href="css/mui.min.css" type="text/css" charset="utf-8"/>
+<style>
+body,.mui-content{
+	background: #FFFFFF;
+}
+.mui-bar{
+	background: url(img/bar.png);
+}
+.mui-title,.mui-bar-nav.mui-bar .mui-icon{
+	color: #FFFFFF;
+}
+.vcc_content{
+	padding-top: 10px;
+	font-size: 14px;
+}
+.mui-input-row label{
+	font-size: 15px;
+}
+.mui-input-row .mui-btn{
+	float: left;
+}
+.vcc_text{
+	padding:0 15px 10px;
+}
+.mui-btn:enabled:active,button:enabled:active{
+	color: #fff !important;
+	background: #FF4B29;
+	border-color: #FF4B29;
+}
+.mui-content-padded .mui-input-row{
+	margin-bottom: 5px;
+	background: #fff;
+}
+.mui-content-padded button{
+	background: #FFf;
+	color: #FF4B29;
+	border-color: #FF4B29;
+}
+</style>
+</head>
+<body style="background: #f2f2f2;">
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<h1 class="mui-title">项目详情</h1>
+</header>
+	<div class="mui-content" style="background: #f2f2f2;">
+		<div class="mui-content-padded">
+			<div class="mui-input-row">
+				<label>年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;份：</label>
+				<div class="vcc_content"><span id="vcc_year"></span>年</div>
+			</div>
+			<div class="mui-input-row">
+				<label>项目类型：</label>
+				<div class="vcc_content" id="vcc_special"></div>
+			</div>
+			<div class="mui-input-row">
+				<label>项目主题：</label>
+				<div class="vcc_content" id="vcc_theme"></div>
+			</div>
+			<div class="mui-input-row">
+				<label>项目内容：</label>
+				<div class="mui-clearfix"></div>
+				<div class="vcc_content vcc_text">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="vcc_content"></span>
+				</div>
+			</div>
+			<div class="mui-input-row">
+				<label>拨款单位：</label>
+				<div class="vcc_content" id="vcc_department"></div>
+			</div>
+			<div class="mui-input-row">
+				<label>拨款金额：</label>
+				<div class="vcc_content" id="vcc_money"></div>
+			</div>
+			<div class="mui-input-row">
+				<label>截止日期：</label>
+				<div class="vcc_content" id="vcc_end"></div>
+			</div>
+			<!-- <div class="mui-input-row">
+				<label>附&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;件：</label>
+				<div class="vcc_content" style="padding-top: 5px;"><button type="button" class="mui-btn" style="width: initial;padding: 6px 12px;border: 1px solid #FF4B29;color: #FF4B29;">
+					查看附件
+				</button></div>
+			</div> -->
+			<div class="mui-input-row">
+				<label>文件列表：</label>
+				<div class="mui-clearfix"></div>
+				<div class="vcc_content vcc_text">
+					<ul id="files" style="text-align:left;">
+					</ul>
+					<p id="empty" style="font-size:14px;color:#C6C6C6;">无上传文件</p>
+				</div>
+			</div>
+		</div>
+		<div class="mui-content-padded" style="text-align: center;">
+			<button id="picture-btn" class="mui-btn mui-btn-primary" type="button" onclick="return false;">添加文件</button>&nbsp;&nbsp;
+			<sapn id="no_up_0">
+				<button id="upload-btn1" class="mui-btn mui-btn-primary" type="button" onclick="return false;">上传文件</button>&nbsp;&nbsp;
+			</sapn>
+			<sapn id="no_up_1" style="display: none;">
+				<button id="upload-btn2" class="mui-btn mui-btn-primary" type="button" onclick="return false;">补充文件</button>&nbsp;&nbsp;
+				<sapn id="no_up_2">
+				<button id="sure-btn" class="mui-btn mui-btn-primary" type="button" onclick="return false;">确认提交</button>
+				</sapn>
+			</sapn>
+		</div>
+	</div>
+</body>
+<script src="js/mui.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/immersed.js" ></script>
+<script type="text/javascript" src="js/jquery-1.11.3.min.js" ></script>
+<script type="text/javascript">
+	var uid = localStorage.getItem('uid');
+	mui.init({
+		swipeBack:false ,//启用右滑关闭功能
+		beforeback: function() {
+	　　　　 //获得父页面的webview
+			var list = plus.webview.currentWebview().opener();
+	　　　　 //触发父页面的自定义事件(refresh),从而进行刷新
+			mui.fire(list, 'toRefresh');
+			//返回true,继续页面关闭逻辑
+			return true;
+		}
+	});
+	var tab = localStorage.getItem('tab');
+	console.log('==========================='+tab);
+	mui.plusReady(function(){
+		var self = plus.webview.currentWebview(); //获取当前窗体对象
+		var contentId = self.contentId;
+		if(tab==0){
+			$('#no_up_0').show();
+			$('#no_up_1').hide()
+		}else{
+			$('#no_up_0').hide()
+			$('#no_up_1').show();
+			if(tab==1){
+				$('#no_up_2').show(); 
+			}else{
+				$('#no_up_2').hide();
+			}
+		}
+		mui.ajax(localStorage.getItem('url')+'/phone/taskMsg',{
+			data:{
+				taskId:contentId,
+			},
+			dataType:'json',//服务器返回json格式数据
+			type:'post',//HTTP请求类型
+			timeout:10000,//超时时间设置为10秒；
+			// headers:{'Content-Type':'application/json'},
+			success:function(data){
+				var state = data.state;
+				var msg = data.msg;
+				//验证成功登录
+				if(state==100){
+					$('#vcc_year').text(data.pd.assign_years);
+					$('#vcc_special').text(data.pd.special_funds_content);
+					$('#vcc_theme').text(data.pd.assign_theme);
+					$('#vcc_content').text(data.pd.assign_content);
+					$('#vcc_department').text(data.pd.super_department_name);
+					$('#vcc_money').text(fmoney(data.pd.assign_money, 2));
+					$('#vcc_end').text(getMoth(data.pd.end_time));
+				}else{//其他问题提示
+					plus.nativeUI.toast(msg);
+				}
+			},
+			error:function(xhr,type,errorThrown){
+				plus.nativeUI.toast('网络异常请稍后尝试');
+			},
+		});
+		//资金格式化
+		function fmoney(s, n){   
+		n = n > 0 && n <= 20 ? n : 2;   
+		s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";   
+		var l = s.split(".")[0].split("").reverse(),   
+		r = s.split(".")[1];   
+		t = "";   
+		for(i = 0; i < l.length; i ++ )   
+		{   
+			t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");   
+		}   
+		return t.split("").reverse().join("") + "." + r;   
+		}
+		//毫秒值格式化时间
+		function getMoth(str){  
+			var oDate = new Date(str), 
+			oYear = oDate.getFullYear(), 
+			oMonth = oDate.getMonth()+1,  
+			oDay = oDate.getDate(),  
+			oTime = oYear +'-'+ getzf(oMonth) +'-'+ getzf(oDay);//最后拼接时间  
+			return oTime;  
+		};
+		//时间补0
+		function getzf(num){  
+			if(parseInt(num) < 10){  
+				num = '0'+num;  
+			}  
+			return num;  
+		} 
+		//确认提交
+		document.getElementById('sure-btn').addEventListener('tap',function(){
+			var btnArray = ['否', '是'];
+			mui.confirm('确定要提交当前项目，确认后将无法删除上传文件？', '提示', btnArray, function(e) {
+				if (e.index == 1) {
+					mui.ajax(localStorage.getItem('url')+'/phone/updateTask',{
+						data:{
+							taskId:contentId,
+						},
+						dataType:'json',//服务器返回json格式数据
+						type:'post',//HTTP请求类型
+						timeout:10000,//超时时间设置为10秒；
+						// headers:{'Content-Type':'application/json'},
+						success:function(data){
+							var state = data.state;
+							var msg = data.msg;
+							if(state==100){
+								plus.nativeUI.toast(msg);
+								mui.back();
+							}else{//其他问题提示
+								plus.nativeUI.toast(msg);
+							}
+						},
+						error:function(xhr,type,errorThrown){
+							plus.nativeUI.toast('网络异常请稍后尝试');
+						},
+					});
+				}
+			})
+		})
+		
+		var server=localStorage.getItem('url')+'/phone/uploadFile?taskId='+contentId+'&uid='+uid;
+		var files=[];
+		// 上传文件
+		document.getElementById('upload-btn1').addEventListener('tap',function(){
+			if(files.length<=0){
+				plus.nativeUI.alert("没有添加上传文件！");
+				return;
+			}
+			// outSet("开始上传：")
+			var wt=plus.nativeUI.showWaiting();
+			var task=plus.uploader.createUpload(server,
+				{method:"POST"},
+				function(t,status){ //上传完成
+					if(status==200){
+						plus.nativeUI.toast("上传成功");
+						wt.close();
+						$('#files').html('');
+						files=[];
+						empty.style.display="block";
+						mui.back();
+					}else{
+						plus.nativeUI.toast("上传失败："+status);
+						wt.close();
+					}
+				}
+			);
+			task.addData("client","HelloH5+");
+			task.addData("uid",getUid());
+			for(var i=0;i<files.length;i++){
+				var f=files[i];
+				task.addFile(f.path,{key:f.name});
+			}
+			task.start();
+		});
+		//补充上传
+		document.getElementById('upload-btn2').addEventListener('tap',function(){
+			if(files.length<=0){
+				plus.nativeUI.alert("没有添加上传文件！");
+				return;
+			}
+			// outSet("开始上传：")
+			var wt=plus.nativeUI.showWaiting();
+			var task=plus.uploader.createUpload(server,
+				{method:"POST"},
+				function(t,status){ //上传完成
+					if(status==200){
+						plus.nativeUI.toast("上传成功");
+						wt.close();
+						$('#files').html('');
+						files=[];
+						empty.style.display="block";
+						mui.back();
+					}else{
+						plus.nativeUI.toast("上传失败："+status);
+						wt.close();
+					}
+				}
+			);
+			task.addData("uid",getUid());
+			for(var i=0;i<files.length;i++){
+				var f=files[i];
+				task.addFile(f.path,{key:f.name});
+			}
+			task.start();
+		});
+		// 拍照添加文件
+		function appendByCamera(){
+			plus.camera.getCamera().captureImage(function(p){
+				appendFile(p);
+			});	
+		}
+		// 从相册添加文件
+		function appendByGallery(){
+			plus.gallery.pick(function(p){
+				appendFile(p);
+			});
+		}
+		// 添加文件
+		var index=1;
+		function appendFile(p){
+			var fe=document.getElementById("files");
+			var li=document.createElement("li");
+			var n=p.substr(p.lastIndexOf('/')+1);
+			li.innerText=n;
+			fe.appendChild(li);
+			files.push({name:"uploadkey"+index,path:p});
+			index++;
+			empty.style.display="none";
+		}
+		// 产生一个随机数
+		function getUid(){
+			return Math.floor(Math.random()*100000000+10000000).toString();
+		}
+		mui('body').on('shown', '.mui-popover', function(e) {
+			//console.log('shown', e.detail.id);//detail为当前popover元素
+		});
+		mui('body').on('hidden', '.mui-popover', function(e) {
+			//console.log('hidden', e.detail.id);//detail为当前popover元素
+		});
+		document.getElementById("picture-btn").addEventListener('tap',function () {
+			var btnArray = [{title:"拍照或录像"},{title:"选取现有的"}];
+			plus.nativeUI.actionSheet( {
+				title:"选择照片",
+				cancel:"取消",
+				buttons:btnArray
+			}, function(e){
+				var index = e.index;
+				var text = "";
+				switch (index){
+					case 0:
+						text += "取消";
+						break;
+					case 1:
+						text += "拍照或录像";
+						appendByCamera();
+						break;
+					case 2:
+						text += "选取现有的";
+						appendByGallery();
+						break;
+				}
+			});
+		});
+	});
+	</script>
+</html>
