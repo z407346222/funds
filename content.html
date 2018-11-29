@@ -67,23 +67,22 @@ body,.mui-content{
 				<div class="vcc_content" id="vcc_theme"></div>
 			</div>
 			<div class="mui-input-row">
-				<label>项目内容：</label>
-				<div class="mui-clearfix"></div>
-				<div class="vcc_content vcc_text">
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="vcc_content"></span>
-				</div>
-			</div>
-			<div class="mui-input-row">
 				<label>拨款单位：</label>
 				<div class="vcc_content" id="vcc_department"></div>
 			</div>
 			<div class="mui-input-row">
-				<label>拨款金额：</label>
+				<label>可用金额：</label>
 				<div class="vcc_content" id="vcc_money"></div>
 			</div>
 			<div class="mui-input-row">
 				<label>截止日期：</label>
 				<div class="vcc_content" id="vcc_end"></div>
+			</div>
+			<div class="mui-input-row">
+				<label>资金码：</label>
+				<div class="vcc_content vcc_text">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="vcc_code"></span>
+				</div>
 			</div>
 			<!-- <div class="mui-input-row">
 				<label>附&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;件：</label>
@@ -108,9 +107,10 @@ body,.mui-content{
 			</sapn>
 			<sapn id="no_up_1" style="display: none;">
 				<button id="upload-btn2" class="mui-btn mui-btn-primary" type="button" onclick="return false;">补充文件</button>&nbsp;&nbsp;
-				<sapn id="no_up_2">
 				<button id="sure-btn" class="mui-btn mui-btn-primary" type="button" onclick="return false;">确认提交</button>
-				</sapn>
+			</sapn>
+			<sapn id="no_up_2" style="display: none;">
+				<button id="upload-btn3" class="mui-btn mui-btn-primary" type="button" onclick="return false;">补充文件</button>&nbsp;&nbsp;
 			</sapn>
 		</div>
 	</div>
@@ -121,6 +121,7 @@ body,.mui-content{
 <script type="text/javascript" src="js/jquery-1.11.3.min.js" ></script>
 <script type="text/javascript">
 	var uid = localStorage.getItem('uid');
+	localStorage.setItem('reload','2');
 	mui.init({
 		swipeBack:false ,//启用右滑关闭功能
 		beforeback: function() {
@@ -133,25 +134,26 @@ body,.mui-content{
 		}
 	});
 	var tab = localStorage.getItem('tab');
-	console.log('==========================='+tab);
 	mui.plusReady(function(){
 		var self = plus.webview.currentWebview(); //获取当前窗体对象
 		var contentId = self.contentId;
 		if(tab==0){
 			$('#no_up_0').show();
-			$('#no_up_1').hide()
-		}else{
-			$('#no_up_0').hide()
+			$('#no_up_1').hide();
+			$('#no_up_2').hide();
+		}else if(tab==1){
 			$('#no_up_1').show();
-			if(tab==1){
-				$('#no_up_2').show(); 
-			}else{
-				$('#no_up_2').hide();
-			}
+			$('#no_up_0').hide();
+			$('#no_up_2').hide();
+		}else{
+			$('#no_up_2').show();
+			$('#no_up_1').hide();
+			$('#no_up_0').hide();
 		}
+			
 		mui.ajax(localStorage.getItem('url')+'/phone/taskMsg',{
 			data:{
-				taskId:contentId,
+				groupId:contentId,
 			},
 			dataType:'json',//服务器返回json格式数据
 			type:'post',//HTTP请求类型
@@ -165,8 +167,8 @@ body,.mui-content{
 					$('#vcc_year').text(data.pd.assign_years);
 					$('#vcc_special').text(data.pd.special_funds_content);
 					$('#vcc_theme').text(data.pd.assign_theme);
-					$('#vcc_content').text(data.pd.assign_content);
-					$('#vcc_department').text(data.pd.super_department_name);
+					$('#vcc_code').text(data.pd.sys_code);
+					$('#vcc_department').text(data.pd.dept_name);
 					$('#vcc_money').text(fmoney(data.pd.assign_money, 2));
 					$('#vcc_end').text(getMoth(data.pd.end_time));
 				}else{//其他问题提示
@@ -213,7 +215,7 @@ body,.mui-content{
 				if (e.index == 1) {
 					mui.ajax(localStorage.getItem('url')+'/phone/updateTask',{
 						data:{
-							taskId:contentId,
+							groupId:contentId,
 						},
 						dataType:'json',//服务器返回json格式数据
 						type:'post',//HTTP请求类型
@@ -224,6 +226,7 @@ body,.mui-content{
 							var msg = data.msg;
 							if(state==100){
 								plus.nativeUI.toast(msg);
+								localStorage.setItem('reload','1');
 								mui.back();
 							}else{//其他问题提示
 								plus.nativeUI.toast(msg);
@@ -237,7 +240,7 @@ body,.mui-content{
 			})
 		})
 		
-		var server=localStorage.getItem('url')+'/phone/uploadFile?taskId='+contentId+'&uid='+uid;
+		var server=localStorage.getItem('url')+'/phone/uploadFile?groupId='+contentId+'&uid='+uid;
 		var files=[];
 		// 上传文件
 		document.getElementById('upload-btn1').addEventListener('tap',function(){
@@ -247,7 +250,7 @@ body,.mui-content{
 			}
 			// outSet("开始上传：")
 			var wt=plus.nativeUI.showWaiting();
-			var task=plus.uploader.createUpload(server,
+			var task=plus.uploader.createUpload(server+'&type=1',
 				{method:"POST"},
 				function(t,status){ //上传完成
 					if(status==200){
@@ -256,6 +259,7 @@ body,.mui-content{
 						$('#files').html('');
 						files=[];
 						empty.style.display="block";
+						localStorage.setItem('reload','1');
 						mui.back();
 					}else{
 						plus.nativeUI.toast("上传失败："+status);
@@ -263,8 +267,6 @@ body,.mui-content{
 					}
 				}
 			);
-			task.addData("client","HelloH5+");
-			task.addData("uid",getUid());
 			for(var i=0;i<files.length;i++){
 				var f=files[i];
 				task.addFile(f.path,{key:f.name});
@@ -279,7 +281,7 @@ body,.mui-content{
 			}
 			// outSet("开始上传：")
 			var wt=plus.nativeUI.showWaiting();
-			var task=plus.uploader.createUpload(server,
+			var task=plus.uploader.createUpload(server+'&type=1',
 				{method:"POST"},
 				function(t,status){ //上传完成
 					if(status==200){
@@ -295,9 +297,38 @@ body,.mui-content{
 					}
 				}
 			);
-			task.addData("uid",getUid());
 			for(var i=0;i<files.length;i++){
 				var f=files[i];
+				task.addFile(f.path,{key:f.name});
+			}
+			task.start();
+		});
+		document.getElementById('upload-btn3').addEventListener('tap',function(){
+			if(files.length<=0){
+				plus.nativeUI.alert("没有添加上传文件！");
+				return;
+			}
+			// outSet("开始上传：")
+			var wt=plus.nativeUI.showWaiting();
+			var task=plus.uploader.createUpload(server+'&type=2',
+				{method:"POST"},
+				function(t,status){ //上传完成
+					if(status==200){
+						plus.nativeUI.toast("上传成功");
+						wt.close();
+						$('#files').html('');
+						files=[];
+						empty.style.display="block";
+						mui.back();
+					}else{
+						plus.nativeUI.toast("上传失败："+status);
+						wt.close();
+					}
+				}
+			);
+			for(var i=0;i<files.length;i++){
+				var f=files[i];
+				console.log(f.name);
 				task.addFile(f.path,{key:f.name});
 			}
 			task.start();
