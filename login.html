@@ -123,6 +123,7 @@
 								}else if(state==101){//第一登录跳转激活
 									plus.nativeUI.toast('账号未激活，请先激活');
 									localStorage.setItem('uid',uid);
+									localStorage.setItem('username',user.value);
 									$.openWindow({
 										url: 'active.html',
 										id: 'active',
