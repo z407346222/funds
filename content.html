@@ -67,22 +67,39 @@ body,.mui-content{
 				<div class="vcc_content" id="vcc_theme"></div>
 			</div>
 			<div class="mui-input-row">
+				<label>项目名称：</label>
+				<div class="vcc_content" id="vcc_name"></div>
+			</div>
+			<div class="mui-input-row">
 				<label>拨款单位：</label>
 				<div class="vcc_content" id="vcc_department"></div>
 			</div>
 			<div class="mui-input-row">
-				<label>可用金额：</label>
+				<label>支付金额：</label>
 				<div class="vcc_content" id="vcc_money"></div>
+			</div>
+			<div class="mui-input-row">
+				<label>扶贫资金用途：</label>
+				<div class="vcc_content" id="vcc_use"></div>
 			</div>
 			<div class="mui-input-row">
 				<label>截止日期：</label>
 				<div class="vcc_content" id="vcc_end"></div>
 			</div>
 			<div class="mui-input-row">
-				<label>资金码：</label>
+				<label>资金链码：</label>
 				<div class="vcc_content vcc_text">
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="vcc_code"></span>
 				</div>
+			</div>
+			<div class="mui-input-row">
+				<label>文件类别：</label>
+				<select class="mui-btn mui-btn-block" id="upload_type" style="width: 60%;">
+					<option value="2">支付凭证银行回单</option>
+					<option value="3">扶贫资金支出明细表</option>
+					<option value="4">项目公告公示</option>
+					<option value="5">其他附件</option>
+				</select>
 			</div>
 			<!-- <div class="mui-input-row">
 				<label>附&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;件：</label>
@@ -101,16 +118,16 @@ body,.mui-content{
 			</div>
 		</div>
 		<div class="mui-content-padded" style="text-align: center;">
-			<button id="picture-btn" class="mui-btn mui-btn-primary" type="button" onclick="return false;">添加文件</button>&nbsp;&nbsp;
+			<button id="picture-btn" class="mui-btn mui-btn-primary" type="button" onclick="return false;">添加凭证</button>&nbsp;&nbsp;
 			<sapn id="no_up_0">
-				<button id="upload-btn1" class="mui-btn mui-btn-primary" type="button" onclick="return false;">上传文件</button>&nbsp;&nbsp;
+				<button id="upload-btn1" class="mui-btn mui-btn-primary" type="button" onclick="return false;">上传凭证</button>&nbsp;&nbsp;
 			</sapn>
 			<sapn id="no_up_1" style="display: none;">
-				<button id="upload-btn2" class="mui-btn mui-btn-primary" type="button" onclick="return false;">补充文件</button>&nbsp;&nbsp;
-				<button id="sure-btn" class="mui-btn mui-btn-primary" type="button" onclick="return false;">确认提交</button>
+				<button id="upload-btn2" class="mui-btn mui-btn-primary" type="button" onclick="return false;">补充凭证</button>&nbsp;&nbsp;
+				<!-- <button id="sure-btn" class="mui-btn mui-btn-primary" type="button" onclick="return false;">确认提交</button> -->
 			</sapn>
 			<sapn id="no_up_2" style="display: none;">
-				<button id="upload-btn3" class="mui-btn mui-btn-primary" type="button" onclick="return false;">补充文件</button>&nbsp;&nbsp;
+				<button id="upload-btn3" class="mui-btn mui-btn-primary" type="button" onclick="return false;">补充凭证</button>&nbsp;&nbsp;
 			</sapn>
 		</div>
 	</div>
@@ -167,9 +184,11 @@ body,.mui-content{
 					$('#vcc_year').text(data.pd.assign_years);
 					$('#vcc_special').text(data.pd.special_funds_content);
 					$('#vcc_theme').text(data.pd.assign_theme);
+					$('#vcc_name').text(data.pd.assign_content);
 					$('#vcc_code').text(data.pd.sys_code);
-					$('#vcc_department').text(data.pd.dept_name);
+					$('#vcc_department').text(data.pd.give_department);
 					$('#vcc_money').text(fmoney(data.pd.assign_money, 2));
+					$('#vcc_use').text(data.pd.funds_type_name);
 					$('#vcc_end').text(getMoth(data.pd.end_time));
 				}else{//其他问题提示
 					plus.nativeUI.toast(msg);
@@ -209,36 +228,36 @@ body,.mui-content{
 			return num;  
 		} 
 		//确认提交
-		document.getElementById('sure-btn').addEventListener('tap',function(){
-			var btnArray = ['否', '是'];
-			mui.confirm('确定要提交当前项目，确认后将无法删除上传文件？', '提示', btnArray, function(e) {
-				if (e.index == 1) {
-					mui.ajax(localStorage.getItem('url')+'/phone/updateTask',{
-						data:{
-							groupId:contentId,
-						},
-						dataType:'json',//服务器返回json格式数据
-						type:'post',//HTTP请求类型
-						timeout:10000,//超时时间设置为10秒；
-						// headers:{'Content-Type':'application/json'},
-						success:function(data){
-							var state = data.state;
-							var msg = data.msg;
-							if(state==100){
-								plus.nativeUI.toast(msg);
-								localStorage.setItem('reload','1');
-								mui.back();
-							}else{//其他问题提示
-								plus.nativeUI.toast(msg);
-							}
-						},
-						error:function(xhr,type,errorThrown){
-							plus.nativeUI.toast('网络异常请稍后尝试');
-						},
-					});
-				}
-			})
-		})
+		// document.getElementById('sure-btn').addEventListener('tap',function(){
+		// 	var btnArray = ['否', '是'];
+		// 	mui.confirm('确定要提交当前项目，确认后将无法删除上传文件？', '提示', btnArray, function(e) {
+		// 		if (e.index == 1) {
+		// 			mui.ajax(localStorage.getItem('url')+'/phone/updateTask',{
+		// 				data:{
+		// 					groupId:contentId,
+		// 				},
+		// 				dataType:'json',//服务器返回json格式数据
+		// 				type:'post',//HTTP请求类型
+		// 				timeout:10000,//超时时间设置为10秒；
+		// 				// headers:{'Content-Type':'application/json'},
+		// 				success:function(data){
+		// 					var state = data.state;
+		// 					var msg = data.msg;
+		// 					if(state==100){
+		// 						plus.nativeUI.toast(msg);
+		// 						localStorage.setItem('reload','1');
+		// 						mui.back();
+		// 					}else{//其他问题提示
+		// 						plus.nativeUI.toast(msg);
+		// 					}
+		// 				},
+		// 				error:function(xhr,type,errorThrown){
+		// 					plus.nativeUI.toast('网络异常请稍后尝试');
+		// 				},
+		// 			});
+		// 		}
+		// 	})
+		// })
 		
 		var server=localStorage.getItem('url')+'/phone/uploadFile?groupId='+contentId+'&uid='+uid;
 		var files=[];
@@ -248,9 +267,10 @@ body,.mui-content{
 				plus.nativeUI.alert("没有添加上传文件！");
 				return;
 			}
+			var upload_type = document.getElementById('upload_type').value;
 			// outSet("开始上传：")
 			var wt=plus.nativeUI.showWaiting();
-			var task=plus.uploader.createUpload(server+'&type=1',
+			var task=plus.uploader.createUpload(server+'&type=1&upload_type='+upload_type,
 				{method:"POST"},
 				function(t,status){ //上传完成
 					if(status==200){
@@ -279,9 +299,10 @@ body,.mui-content{
 				plus.nativeUI.alert("没有添加上传文件！");
 				return;
 			}
+			var upload_type = document.getElementById('upload_type').value;
 			// outSet("开始上传：")
 			var wt=plus.nativeUI.showWaiting();
-			var task=plus.uploader.createUpload(server+'&type=1',
+			var task=plus.uploader.createUpload(server+'&type=1&upload_type='+upload_type,
 				{method:"POST"},
 				function(t,status){ //上传完成
 					if(status==200){
@@ -308,9 +329,10 @@ body,.mui-content{
 				plus.nativeUI.alert("没有添加上传文件！");
 				return;
 			}
+			var upload_type = document.getElementById('upload_type').value;
 			// outSet("开始上传：")
 			var wt=plus.nativeUI.showWaiting();
-			var task=plus.uploader.createUpload(server+'&type=2',
+			var task=plus.uploader.createUpload(server+'&type=2&upload_type='+upload_type,
 				{method:"POST"},
 				function(t,status){ //上传完成
 					if(status==200){
